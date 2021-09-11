@@ -86,11 +86,13 @@ export default function DbReader() {
 
     useEffect(fetchDb, []);
 
-    console.log(data);
+    //console.log(data);
 
     if(fetching){
         return ( 
-            <CircularProgress />
+            <div>
+                <DbTable loading={fetching} data={data} />
+            </div>
         );
     } else if (data.length <= 0) {
         return (

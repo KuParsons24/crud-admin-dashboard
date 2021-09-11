@@ -1,11 +1,11 @@
 import './App.css';
 import React from 'react';
-import DbReader from './Components/DbReader';
+import DbTable from './Components/DbTable';
 
 function App() {
   return (
     <div>
-      <DbReader />
+      <DbTable />
     </div>
   );
 }
