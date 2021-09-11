@@ -1,6 +1,7 @@
 import { Button } from "@material-ui/core";
 import { DataGrid } from "@mui/x-data-grid";
 import React, { useEffect, useState } from "react";
+import DeletePopUp from "./DeletePopUp";
 import SimpleSnackbar from "./SnackBar";
 import CustomizedSnackbars from "./SnackBar";
 
@@ -11,6 +12,7 @@ export default function DbTable () {
   const [snackBarOpen, setSnackBarOpen] = useState(false);
   const [snackBarMessage, setSnackBarMessage] = useState('');
   const [pageSize, setPageSize] = useState(5);
+  const [deletePopUpOpen, setDeletePopUpOpen] = useState(false);
 
   const loadDb = () => {
       setFetching(true);
@@ -119,14 +121,15 @@ export default function DbTable () {
         onSelectionModelChange={(newSelection) => {setSelection(newSelection);}}
       />
       <Button
-       variant='contained' 
-       color='secondary'
-       disabled={selection.length > 0 ? false : true}
-       onClick={handleDelete}
+        variant='contained' 
+        color='secondary'
+        disabled={selection.length > 0 ? false : true}
+        onClick={() => setDeletePopUpOpen(true)}
        >
         DELETE ENTRY
       </Button>
       <SimpleSnackbar message={snackBarMessage} open={snackBarOpen} setOpen={setSnackBarOpen}/>
+      <DeletePopUp open={deletePopUpOpen} setOpen={setDeletePopUpOpen} handleAcknowledge={handleDelete} />
     </div>
   );
 }
