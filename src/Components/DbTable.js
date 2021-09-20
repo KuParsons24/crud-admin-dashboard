@@ -1,7 +1,9 @@
 import { Button } from "@material-ui/core";
 import { DataGrid } from "@mui/x-data-grid";
 import React, { useEffect, useState } from "react";
+import AddPopUp from "./AddPopUp";
 import DeletePopUp from "./DeletePopUp";
+import EditPopUp from "./EditPopUp";
 import SimpleSnackbar from "./SnackBar";
 import CustomizedSnackbars from "./SnackBar";
 
@@ -13,13 +15,16 @@ export default function DbTable () {
   const [snackBarMessage, setSnackBarMessage] = useState('');
   const [pageSize, setPageSize] = useState(5);
   const [deletePopUpOpen, setDeletePopUpOpen] = useState(false);
+  const [editPopUpOpen, setEditPopUpOpen] = useState(false);
+  const [editData, setEditData] = useState({});
+  const [addPopUpOpen, setAddPopUpOpen] = useState(false);
+  const [addData, setAddData] = useState({});
 
   const loadDb = () => {
       setFetching(true);
       fetch("/admin/contact/api")
       .then((res) => res.json())
       .then((json) => {
-          // setData(json);
           setFetching(false);
           setData(json)
       })
@@ -37,20 +42,20 @@ export default function DbTable () {
       field: 'name',
       headerName: 'Name',
       width: 150,
-      editable: true,
+      editable: false,
     },
     {
       field: 'email',
       headerName: 'Email',
       width: 180,
-      editable: true,
+      editable: false,
     },
     {
       field: 'message',
       headerName: 'Message',
       description: 'This column has a value getter and is not sortable.',
       sortable: false,
-      editable: true,
+      editable: false,
       width: 700,
       // valueGetter: (params) =>
       //   `${params.getValue(params.id, 'firstName') || ''} ${
@@ -59,8 +64,26 @@ export default function DbTable () {
     },
   ];
 
-  const isNotSelected = (entry) => {
-    return selection.indexOf(entry.id) === -1; 
+  const handleAdd = () => {
+    fetch('/admin/contact/api', {
+      method: 'POST',
+      headers :{
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(addData)
+    })
+    .then((res) => res.json())
+    .then((json) => {
+      const obj = JSON.parse(json);
+      if (obj.addSuccess) {
+        loadDb();
+        setSnackBarMessage('Succesfully Added Entry!');
+        setSnackBarOpen(true);
+      } else {
+        setSnackBarMessage('Error! Entry was not added.');
+        setSnackBarOpen(true);
+      }
+    })
   }
 
   const handleDelete = () => {
@@ -72,34 +95,41 @@ export default function DbTable () {
       body: JSON.stringify(selection)
     })
     .then((res) => {
-      console.log(res);
       return res.json()   
     })
     .then((json) => {
       const obj = JSON.parse(json);
-      console.log(obj);
       if (obj.deleteSuccess) {
         loadDb();
         setSnackBarMessage('Succesfully Deleted Entry!');
         setSnackBarOpen(true);
-        //let tableData = prevState;
-        // setData((prevState) => {
-        //   let filteredState = prevState.filter(isNotSelected);
-        //   console.log(filteredState);
-        //   return filteredState;
-        //   //Stuff below does not work!!!
-        //   // prevState.map((row) => {
-        //   //   //console.log(row.id);
-        //   //   if (selection.indexOf(row.id) !== -1) {
-        //   //     console.log(row.id);
-        //   //     prevState.splice(prevState.indexOf(row.id - 1), 1);
-        //   //     //return prevState[row.id - 1];
-        //     // }
-        //   // });
-        //   //return tableData;
-        // });
       } else {
+        setSnackBarMessage('Error! Entry was not deleted.');
+        setSnackBarOpen(true);
+      }
+    });
+  }
 
+  const handleEdit = () => {
+    fetch('/admin/contact/api', {
+      method: 'PUT',
+      headers :{
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(editData)
+    })
+    .then((res) => {
+      return res.json()   
+    })
+    .then((json) => {
+      const obj = JSON.parse(json);
+      if (obj.editSuccess){
+        loadDb();
+        setSnackBarMessage('Succesfully Modified Entry!');
+        setSnackBarOpen(true);
+      } else {
+        setSnackBarMessage('Error! Entry was not changed.');
+        setSnackBarOpen(true);
       }
     });
   }
@@ -125,11 +155,43 @@ export default function DbTable () {
         color='secondary'
         disabled={selection.length > 0 ? false : true}
         onClick={() => setDeletePopUpOpen(true)}
-       >
-        DELETE ENTRY
+      >
+        DELETE
+      </Button>
+      <Button
+        variant='contained' 
+        color='primary'
+        disabled={selection.length > 0 && selection.length <= 1 ? false : true}
+        onClick={() => {
+          setEditPopUpOpen(true);
+          //console.log(data.findIndex((entry) => entry.id === selection[0]));
+          setEditData(data[data.findIndex((entry) => entry.id === selection[0])]);
+        }}
+      >
+        EDIT
+      </Button>
+      <Button
+        variant='contained'
+        color='primary'
+
+      >
+        ADD
       </Button>
       <SimpleSnackbar message={snackBarMessage} open={snackBarOpen} setOpen={setSnackBarOpen}/>
       <DeletePopUp open={deletePopUpOpen} setOpen={setDeletePopUpOpen} handleAcknowledge={handleDelete} />
+      <EditPopUp 
+        open={editPopUpOpen}
+        setOpen={setEditPopUpOpen}
+        editData={editData}
+        setEditData={setEditData} 
+        handleAcknowledge={handleEdit}
+      />
+      <AddPopUp  
+        open={addPopUpOpen}
+        setOpen={setAddPopUpOpen}
+        editData={addData}
+        setEditData={setAddData}
+      />
     </div>
   );
 }
