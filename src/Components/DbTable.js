@@ -1,4 +1,4 @@
-import { Button } from "@material-ui/core";
+import { Button, ButtonGroup } from "@material-ui/core";
 import { DataGrid } from "@mui/x-data-grid";
 import React, { useEffect, useState } from "react";
 import AddPopUp from "./AddPopUp";
@@ -150,33 +150,42 @@ export default function DbTable () {
         //getRowId={(row) => row.id}
         onSelectionModelChange={(newSelection) => {setSelection(newSelection);}}
       />
-      <Button
-        variant='contained' 
-        color='secondary'
-        disabled={selection.length > 0 ? false : true}
-        onClick={() => setDeletePopUpOpen(true)}
-      >
-        DELETE
-      </Button>
-      <Button
-        variant='contained' 
-        color='primary'
-        disabled={selection.length > 0 && selection.length <= 1 ? false : true}
-        onClick={() => {
-          setEditPopUpOpen(true);
-          //console.log(data.findIndex((entry) => entry.id === selection[0]));
-          setEditData(data[data.findIndex((entry) => entry.id === selection[0])]);
-        }}
-      >
-        EDIT
-      </Button>
-      <Button
-        variant='contained'
-        color='primary'
-
-      >
-        ADD
-      </Button>
+      <ButtonGroup>
+        <Button
+          variant='contained' 
+          color='secondary'
+          disabled={selection.length > 0 ? false : true}
+          onClick={() => setDeletePopUpOpen(true)}
+        >
+          DELETE
+        </Button>
+        <Button
+          variant='contained' 
+          color='primary'
+          disabled={selection.length > 0 && selection.length <= 1 ? false : true}
+          onClick={() => {
+            setEditPopUpOpen(true);
+            //console.log(data.findIndex((entry) => entry.id === selection[0]));
+            setEditData(data[data.findIndex((entry) => entry.id === selection[0])]);
+          }}
+        >
+          EDIT
+        </Button>
+        <Button
+          variant='contained'
+          color='primary'
+          onClick={() => {
+            setAddPopUpOpen(true);
+            setAddData({
+              name: '',
+              email: '',
+              message: ''
+            });
+          }}
+        >
+          ADD
+        </Button>
+      </ButtonGroup>
       <SimpleSnackbar message={snackBarMessage} open={snackBarOpen} setOpen={setSnackBarOpen}/>
       <DeletePopUp open={deletePopUpOpen} setOpen={setDeletePopUpOpen} handleAcknowledge={handleDelete} />
       <EditPopUp 
@@ -191,6 +200,7 @@ export default function DbTable () {
         setOpen={setAddPopUpOpen}
         editData={addData}
         setEditData={setAddData}
+        handleAcknowledge={handleAdd}
       />
     </div>
   );
