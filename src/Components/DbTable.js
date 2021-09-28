@@ -1,11 +1,16 @@
-import { Button, ButtonGroup } from "@material-ui/core";
+import { Box, Button, ButtonGroup, makeStyles } from "@material-ui/core";
 import { DataGrid } from "@mui/x-data-grid";
 import React, { useEffect, useState } from "react";
 import AddPopUp from "./AddPopUp";
 import DeletePopUp from "./DeletePopUp";
 import EditPopUp from "./EditPopUp";
 import SimpleSnackbar from "./SnackBar";
-import CustomizedSnackbars from "./SnackBar";
+
+const useStyles = makeStyles({
+  box: {
+    height: 'calc(100% - 100px)'
+  },
+});
 
 export default function DbTable () {
   const [data, setData] = useState([]);
@@ -20,18 +25,25 @@ export default function DbTable () {
   const [addPopUpOpen, setAddPopUpOpen] = useState(false);
   const [addData, setAddData] = useState({});
 
+  const classes = useStyles();
+
+  const timeoutError = () => {
+    setSnackBarMessage(`Request timed out.`);
+    setSnackBarOpen(true);
+  }
+
   const loadDb = () => {
-      setFetching(true);
-      fetch("/admin/contact/api")
-      .then((res) => res.json())
-      .then((json) => {
-          setFetching(false);
-          setData(json)
-      })
-      .catch((error) => {
-          console.error(error);
-          setFetching(false);
-      });      
+    setFetching(true);
+    fetch("/admin/contact/api")
+    .then((res) => res.json())
+    .then((json) => {
+        setFetching(false);
+        setData(json)
+    })
+    .catch((error) => {
+        console.error(error);
+        setFetching(false);
+    });      
   }
 
   useEffect(loadDb, []);
@@ -56,23 +68,27 @@ export default function DbTable () {
       description: 'This column has a value getter and is not sortable.',
       sortable: false,
       editable: false,
-      width: 700,
-      // valueGetter: (params) =>
-      //   `${params.getValue(params.id, 'firstName') || ''} ${
-      //     params.getValue(params.id, 'lastName') || ''
-      //   }`,
+      flex: 1,
+      minWidth: 400
     },
   ];
 
   const handleAdd = () => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => {
+      controller.abort();
+    }, 5000);
     fetch('/admin/contact/api', {
       method: 'POST',
       headers :{
         'Content-Type': 'application/json'
       },
+      signal: controller.signal,
       body: JSON.stringify(addData)
     })
-    .then((res) => res.json())
+    .then((res) => {
+      return res.json()
+    })
     .then((json) => {
       const obj = JSON.parse(json);
       if (obj.addSuccess) {
@@ -84,14 +100,24 @@ export default function DbTable () {
         setSnackBarOpen(true);
       }
     })
+    .catch((err) => {
+      console.log(err.name);
+      if (err.name === 'AbortError');
+        timeoutError();
+    })
   }
 
   const handleDelete = () => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => {
+      controller.abort();
+    }, 5000);
     fetch('/admin/contact/api', {
       method: 'DELETE',
       headers :{
         'Content-Type': 'application/json'
       },
+      signal: controller.signal,
       body: JSON.stringify(selection)
     })
     .then((res) => {
@@ -107,15 +133,25 @@ export default function DbTable () {
         setSnackBarMessage('Error! Entry was not deleted.');
         setSnackBarOpen(true);
       }
+    })
+    .catch((err) => {
+      console.log(err.name);
+      if (err.name === 'AbortError');
+        timeoutError();
     });
   }
 
   const handleEdit = () => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => {
+      controller.abort();
+    }, 5000);
     fetch('/admin/contact/api', {
       method: 'PUT',
       headers :{
         'Content-Type': 'application/json'
       },
+      signal: controller.signal,
       body: JSON.stringify(editData)
     })
     .then((res) => {
@@ -131,12 +167,16 @@ export default function DbTable () {
         setSnackBarMessage('Error! Entry was not changed.');
         setSnackBarOpen(true);
       }
+    })
+    .catch((err) => {
+      console.log(err.name);
+      if (err.name === 'AbortError');
+        timeoutError();
     });
   }
 
-
   return (
-    <div style={{ height: 400, width: '100%' }}>
+    <Box component='div' className={classes.box} >
       <DataGrid
         rows={data}
         columns={columns}
@@ -147,7 +187,6 @@ export default function DbTable () {
         checkboxSelection
         disableSelectionOnClick
         editMode='row'
-        //getRowId={(row) => row.id}
         onSelectionModelChange={(newSelection) => {setSelection(newSelection);}}
       />
       <ButtonGroup>
@@ -165,7 +204,6 @@ export default function DbTable () {
           disabled={selection.length > 0 && selection.length <= 1 ? false : true}
           onClick={() => {
             setEditPopUpOpen(true);
-            //console.log(data.findIndex((entry) => entry.id === selection[0]));
             setEditData(data[data.findIndex((entry) => entry.id === selection[0])]);
           }}
         >
@@ -202,7 +240,7 @@ export default function DbTable () {
         setEditData={setAddData}
         handleAcknowledge={handleAdd}
       />
-    </div>
+    </Box>
   );
 }
 

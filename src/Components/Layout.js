@@ -1,7 +1,8 @@
 import { AppBar, Box, CssBaseline, Divider, Drawer, List, ListItem, ListItemIcon, ListItemText, Toolbar, Typography } from '@material-ui/core';
-import { Inbox, Mail } from '@material-ui/icons';
+import { Storage } from '@material-ui/icons';
 import { makeStyles } from '@material-ui/styles';
 import * as React from 'react';
+import { useHistory, useLocation } from 'react-router';
 
 const drawerWidth = 240;
 
@@ -19,28 +20,43 @@ const useStyles = makeStyles({
     }
   },
   box: {
-    flexGrow: 1, 
+    flexGrow: 1,
+    height: '100vh', 
     bgcolor: 'background.default', 
     p: 3
   },
   root: {
-    display: 'flex'
+    display: 'flex',
+  },
+  active: {
+    backgroundColor: "#f4f4f4"
   }
 });
 
 export default function Layout(props) {
   const classes = useStyles();
+  const history = useHistory();
+  const location = useLocation();
+
+  const menuItems = [
+    {
+      text: 'Contact DB',
+      icon: <Storage />,
+      path: '/'
+    }
+  ]
+
   return (
     <Box className={classes.root}>
       <CssBaseline />
       <AppBar
         position='fixed'
-        elevation={false}
+        elevation={0}
         className={classes.appBar}
       >
         <Toolbar>
           <Typography variant="h6" noWrap component="div">
-            Permanent drawer
+            Contact Database
           </Typography>
         </Toolbar>
       </AppBar>
@@ -52,23 +68,15 @@ export default function Layout(props) {
         <Toolbar />
         <Divider />
         <List>
-          {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
-            <ListItem button key={text}>
-              <ListItemIcon>
-                {index % 2 === 0 ? <Inbox /> : <Mail />}
-              </ListItemIcon>
-              <ListItemText primary={text} />
-            </ListItem>
-          ))}
-        </List>
-        <Divider />
-        <List>
-          {['All mail', 'Trash', 'Spam'].map((text, index) => (
-            <ListItem button key={text}>
-              <ListItemIcon>
-                {index % 2 === 0 ? <Inbox /> : <Mail />}
-              </ListItemIcon>
-              <ListItemText primary={text} />
+          {menuItems.map((item, index) => (
+            <ListItem 
+              button 
+              key={item.text}
+              onClick={() => history.push(item.path)}
+              className={location.pathname === item.path ? classes.active : null}
+            >
+              <ListItemIcon>{item.icon}</ListItemIcon>
+              <ListItemText primary={item.text} />
             </ListItem>
           ))}
         </List>
