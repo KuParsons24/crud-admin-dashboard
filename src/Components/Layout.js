@@ -1,5 +1,6 @@
-import { AppBar, Box, CssBaseline, Divider, Drawer, List, ListItem, ListItemIcon, ListItemText, Toolbar, Typography } from '@material-ui/core';
+import { AppBar, Box, CssBaseline, Divider, Drawer, IconButton, List, ListItem, ListItemIcon, ListItemText, Toolbar, Typography } from '@material-ui/core';
 import { Storage } from '@material-ui/icons';
+import MenuIcon from '@material-ui/icons/Menu';
 import { makeStyles } from '@material-ui/styles';
 import * as React from 'react';
 import { useHistory, useLocation } from 'react-router';
@@ -10,6 +11,9 @@ const useStyles = makeStyles({
   appBar: {
     width: `calc(100% - ${drawerWidth}px)`,
     marginLeft: drawerWidth,
+  },
+  appBarMobile: {
+    width: `calc(100%)`,
   },
   drawer: {
     width: drawerWidth,
@@ -37,6 +41,7 @@ export default function Layout(props) {
   const classes = useStyles();
   const history = useHistory();
   const location = useLocation();
+  const [drawerOpen, setDrawerOpen] = React.useState(false);
 
   const menuItems = [
     {
@@ -46,15 +51,32 @@ export default function Layout(props) {
     }
   ]
 
+  const handleDrawerToggle = () => {
+    setDrawerOpen(!drawerOpen);
+  }
+
+  const menuButton = (
+    <IconButton
+    color="inherit"
+    aria-label="open drawer"
+    edge="start"
+    onClick={handleDrawerToggle}
+    className={classes.menuButton}
+    >
+      <MenuIcon />
+    </IconButton>
+  );
+
   return (
     <Box className={classes.root}>
       <CssBaseline />
       <AppBar
         position='fixed'
         elevation={0}
-        className={classes.appBar}
+        className={props.isMobile ? classes.appBarMobile : classes.appBar}
       >
         <Toolbar>
+          {props.isMobile ? menuButton : null}
           <Typography variant="h6" noWrap component="div">
             Contact Database
           </Typography>
@@ -62,8 +84,10 @@ export default function Layout(props) {
       </AppBar>
       <Drawer
         className={classes.drawer}
-        variant="permanent"
+        variant={props.isMobile ? 'temporary' : 'permanent'}
+        open={props.isMobile ? drawerOpen : true}
         anchor="left"
+        onClose={handleDrawerToggle}
       >
         <Toolbar />
         <Divider />
