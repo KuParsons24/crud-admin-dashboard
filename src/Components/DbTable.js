@@ -12,6 +12,8 @@ const useStyles = makeStyles({
   },
 });
 
+const dbRoute = '/api/admin/contact';
+
 export default function DbTable () {
   const [data, setData] = useState([]);
   const [selection, setSelection] = useState([]);
@@ -34,7 +36,7 @@ export default function DbTable () {
 
   const loadDb = () => {
     setFetching(true);
-    fetch("/admin/contact/api")
+    fetch(dbRoute)
     .then((res) => res.json())
     .then((json) => {
         setFetching(false);
@@ -78,7 +80,7 @@ export default function DbTable () {
     const timeoutId = setTimeout(() => {
       controller.abort();
     }, 5000);
-    fetch('/admin/contact/api', {
+    fetch(dbRoute, {
       method: 'POST',
       headers :{
         'Content-Type': 'application/json'
@@ -112,7 +114,7 @@ export default function DbTable () {
     const timeoutId = setTimeout(() => {
       controller.abort();
     }, 5000);
-    fetch('/admin/contact/api', {
+    fetch(dbRoute, {
       method: 'DELETE',
       headers :{
         'Content-Type': 'application/json'
@@ -146,7 +148,7 @@ export default function DbTable () {
     const timeoutId = setTimeout(() => {
       controller.abort();
     }, 5000);
-    fetch('/admin/contact/api', {
+    fetch(dbRoute, {
       method: 'PUT',
       headers :{
         'Content-Type': 'application/json'
