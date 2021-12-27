@@ -21,7 +21,7 @@ function App() {
   let isMobile = (width <= 820);
 
   return (
-    <Router basename='/'>
+    <Router basename='/crud'>
       <Layout isMobile={isMobile}>
         <Switch>
           <Route exact path='/'>
