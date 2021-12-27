@@ -1,8 +1,8 @@
 const express = require('express');
 const app = express();
-const port = process.env.BACKEND_PORT || 3000;
 const path = require('path');
 require('dotenv').config();
+const port = process.env.BACKEND_PORT || 3002;
 
 app.listen(port, () => {
   console.log(`Listening on port ${port}`);
