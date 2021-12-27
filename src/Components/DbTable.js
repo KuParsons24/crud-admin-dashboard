@@ -12,7 +12,7 @@ const useStyles = makeStyles({
   },
 });
 
-const dbRoute = '/api/admin/contact';
+const dbRoute = 'http://localhost:3000/api/admin/contact';
 
 export default function DbTable () {
   const [data, setData] = useState([]);
