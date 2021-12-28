@@ -12,7 +12,7 @@ const useStyles = makeStyles({
   },
 });
 
-const dbRoute = 'http://localhost:3000/api/admin/contact';
+const dbRoute = 'http://kuparsons24.ddnsfree.com/api/admin/contact';
 
 export default function DbTable () {
   const [data, setData] = useState([]);
